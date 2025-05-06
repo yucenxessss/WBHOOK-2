@@ -1,3 +1,4 @@
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -210,6 +211,40 @@ async def gen_webhooks(interaction: discord.Interaction):
 
     await saved_webhook_channel.send(embed=webhook_embed)
     await interaction.followup.send("✅ Server reset and webhooks generated successfully!", ephemeral=True)
+
+# ─── Help Command ──────────────────────────────────────────────────────
+@bot.tree.command(name="help", description="Show a list of all commands and descriptions.")
+async def help_command(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=False, ephemeral=True)
+
+    help_embed = discord.Embed(
+        title="🛠️ Command List",
+        description="Here are the available commands you can use:",
+        color=discord.Color.dark_gold()
+    )
+
+    help_embed.add_field(
+        name="/set_maturity",
+        value="🔧 Automatically sets a Roblox game's maturity to **Minimal**.\nRequires your `.ROBLOSECURITY` cookie and the game's **Place ID**.",
+        inline=False
+    )
+
+    help_embed.add_field(
+        name="/gen_webhooks",
+        value="🧹 Wipes the server channels, recreates a structured layout, and auto-generates webhooks inside a red embed.",
+        inline=False
+    )
+
+    help_embed.add_field(
+        name="/help",
+        value="📘 Displays this help menu with a list of available commands.",
+        inline=False
+    )
+
+    help_embed.set_footer(text="Bot by ArzconicMgui | Use commands wisely.")
+    help_embed.set_thumbnail(url="https://i.imgur.com/5cX1G98.png")  # Optional cool thumbnail
+
+    await interaction.followup.send(embed=help_embed, ephemeral=True)
 
 # ─── Start everything ─────────────────────────────────────────────────
 keep_alive()
