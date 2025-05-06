@@ -181,7 +181,7 @@ async def gen_webhooks(interaction: discord.Interaction):
         for chan_name in channels:
             channel = await guild.create_text_channel(chan_name, category=category)
             created_channels[chan_name] = channel
-            if chan_name == "〔🕸️〕saved webhook":
+            if chan_name == "【🕸】𝚂𝙰𝚅𝙴𝙳 𝚆𝙴𝙱𝙷𝙾𝙾𝙺":
                 saved_webhook_channel = channel
 
     if not saved_webhook_channel:
