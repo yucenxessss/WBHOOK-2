@@ -189,7 +189,7 @@ async def gen_webhooks(interaction: discord.Interaction):
         return
 
     webhook_embed = discord.Embed(
-        title="🕸️ Saved Webhooks",
+        title="【🕸】𝚂𝙰𝚅𝙴𝙳 𝚆𝙴𝙱𝙷𝙾𝙾𝙺",
         description="Here are your generated webhooks.",
         color=discord.Color.red()
     )
