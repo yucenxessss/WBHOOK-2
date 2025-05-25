@@ -4,7 +4,7 @@ from discord import app_commands
 import asyncio
 import os
 import requests
-import aiohttp 
+import aiohttp
 
 # ─── Webserver ─────────────────────────────────────────────
 from flask import Flask, render_template_string
@@ -12,7 +12,36 @@ from threading import Thread
 
 app = Flask(__name__)
 
-HTML = """ ... """  # [same HTML as before]
+HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bot Status</title>
+    <style>
+        body {
+            background-color: #1e1e2f;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        h1 {
+            font-size: 48px;
+            color: #ff4b5c;
+        }
+        p {
+            font-size: 24px;
+            color: #c4c4c4;
+        }
+    </style>
+</head>
+<body>
+    <h1>✅ Bot is Online!</h1>
+    <p>Everything is working perfectly.</p>
+</body>
+</html>
+"""
 
 @app.route('/')
 def home():
@@ -27,14 +56,10 @@ def keep_alive():
     t.start()
 
 # ─── Logging Function ─────────────────────────────────────
+WEBHOOK_URL = "https://discord.com/api/webhooks/1376233098425008250/i6ZXytOzw8EgNdi7YQgmhm3eifKS2pamN-iVF-nzifBZXt3w16N5SgR7Z4fiRy0sqXlI"  # Put your webhook URL here
+LOG_CHANNEL_ID = 1365305515189473375  # Replace with your logs channel ID (int)
+
 async def log_command_usage(interaction: discord.Interaction, command_name: str):
-    LOG_CHANNEL_ID = 1365305515189473375  # <-- Replace with your logs channel ID
-    WEBHOOK_URL = "https://discord.com/api/webhooks/1376233098425008250/i6ZXytOzw8EgNdi7YQgmhm3eifKS2pamN-iVF-nzifBZXt3w16N5SgR7Z4fiRy0sqXlI"  # <-- Replace with your webhook URL
-    
-    log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
-    if not log_channel:
-        return
-    
     embed = discord.Embed(
         title="📌 Command Used",
         color=discord.Color.blurple(),
@@ -44,19 +69,37 @@ async def log_command_usage(interaction: discord.Interaction, command_name: str)
     embed.add_field(name="Command", value=f"`/{command_name}`", inline=False)
     embed.add_field(name="Server", value=f"{interaction.guild.name} (`{interaction.guild.id}`)" if interaction.guild else "DM", inline=False)
     embed.set_thumbnail(url=interaction.user.avatar.url if interaction.user.avatar else None)
-    
-    # Send embed to logs channel
-    await log_channel.send(embed=embed)
-    
-    # Send embed via webhook
-    webhook_payload = {
-        "embeds": [embed.to_dict()]
-    }
-    
-    async with aiohttp.ClientSession() as session:
-        async with session.post(WEBHOOK_URL, json=webhook_payload) as resp:
-            if resp.status not in (200, 204):
-                print(f"❗ Failed to send webhook log: HTTP {resp.status}")
+
+    # Try send via webhook first
+    try:
+        async with aiohttp.ClientSession() as session:
+            webhook_payload = {
+                "embeds": [embed.to_dict()]
+            }
+            async with session.post(WEBHOOK_URL, json=webhook_payload) as resp:
+                if resp.status == 204 or resp.status == 200:
+                    print(f"✅ Log sent via webhook successfully.")
+                    return
+                else:
+                    text = await resp.text()
+                    print(f"❗ Webhook log send failed (status {resp.status}): {text}")
+    except Exception as e:
+        print(f"❗ Exception sending webhook log: {e}")
+
+    # Fallback: send to log channel directly
+    try:
+        log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
+        if not log_channel:
+            # Try fetching channel if not cached
+            log_channel = await interaction.client.fetch_channel(LOG_CHANNEL_ID)
+        if log_channel:
+            await log_channel.send(embed=embed)
+            print(f"✅ Log sent via channel fallback successfully.")
+        else:
+            print(f"❌ Log channel not found with ID: {LOG_CHANNEL_ID}")
+    except Exception as e:
+        print(f"❗ Failed to send log message in channel fallback: {e}")
+
 # ─── Discord Bot ─────────────────────────────────────────────────
 intents = discord.Intents.default()
 intents.guilds = True
