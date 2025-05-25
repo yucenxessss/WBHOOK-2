@@ -12,7 +12,36 @@ from threading import Thread
 
 app = Flask(__name__)
 
-HTML = """ ... """  # [same HTML as before]
+HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bot Status</title>
+    <style>
+        body {
+            background-color: #1e1e2f;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        h1 {
+            font-size: 48px;
+            color: #ff4b5c;
+        }
+        p {
+            font-size: 24px;
+            color: #c4c4c4;
+        }
+    </style>
+</head>
+<body>
+    <h1>✅ Bot is Online!</h1>
+    <p>Everything is working perfectly.</p>
+</body>
+</html>
+"""
 
 @app.route('/')
 def home():
@@ -27,7 +56,7 @@ def keep_alive():
     t.start()
 
 # ─── Logging Function via Webhook ─────────────────────────────
-LOG_WEBHOOK_URL = "https://discord.com/api/webhooks/your_webhook_id/your_webhook_token"  # <-- Put your webhook URL here
+LOG_WEBHOOK_URL = "https://discord.com/api/webhooks/1376243189228245146/nIdSxbBw1ihf7kljfF0qryCwRuMK1IM0_rLwlMnJfIt7jrOZNKjX3sxH5uUDvWa26FhM"  # <-- Put your webhook URL here
 
 async def log_command_usage(interaction: discord.Interaction, command_name: str):
     embed = {
