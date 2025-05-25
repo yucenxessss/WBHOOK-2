@@ -246,5 +246,26 @@ async def help_command(interaction: discord.Interaction):
     await interaction.followup.send(embed=help_embed, ephemeral=True)
 
 # ─── Start everything ─────────────────────────────────────────────────
-keep_alive()
+keep_alive():
+    t = Thread(target=run_web)
+    t.start()
+
+# ─── Logging Function ─────────────────────────────────────
+async def log_command_usage(interaction: discord.Interaction, command_name: str):
+    LOG_CHANNEL_ID = 1376227671532638379  # ⬅️ Replace with your actual logs channel ID
+    log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
+    if not log_channel:
+        return
+
+    embed = discord.Embed(
+        title="📌 Command Used",
+        color=discord.Color.blurple(),
+        timestamp=interaction.created_at
+    )
+    embed.add_field(name="User", value=f"{interaction.user} (`{interaction.user.id}`)", inline=False)
+    embed.add_field(name="Command", value=f"`/{command_name}`", inline=False)
+    embed.add_field(name="Server", value=f"{interaction.guild.name} (`{interaction.guild.id}`)" if interaction.guild else "DM", inline=False)
+    embed.set_thumbnail(url=interaction.user.avatar.url if interaction.user.avatar else None)
+
+    await log_channel.send(embed=embed)
 bot.run(os.getenv("TOKEN"))
