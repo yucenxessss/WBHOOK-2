@@ -4,6 +4,7 @@ from discord import app_commands
 import asyncio
 import os
 import requests
+import aiohttp 
 
 # ─── Webserver ─────────────────────────────────────────────
 from flask import Flask, render_template_string
@@ -28,10 +29,12 @@ def keep_alive():
 # ─── Logging Function ─────────────────────────────────────
 async def log_command_usage(interaction: discord.Interaction, command_name: str):
     LOG_CHANNEL_ID = 1365305515189473375  # <-- Replace with your logs channel ID
+    WEBHOOK_URL = "https://discord.com/api/webhooks/1376233098425008250/i6ZXytOzw8EgNdi7YQgmhm3eifKS2pamN-iVF-nzifBZXt3w16N5SgR7Z4fiRy0sqXlI"  # <-- Replace with your webhook URL
+    
     log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
     if not log_channel:
         return
-
+    
     embed = discord.Embed(
         title="📌 Command Used",
         color=discord.Color.blurple(),
@@ -41,9 +44,19 @@ async def log_command_usage(interaction: discord.Interaction, command_name: str)
     embed.add_field(name="Command", value=f"`/{command_name}`", inline=False)
     embed.add_field(name="Server", value=f"{interaction.guild.name} (`{interaction.guild.id}`)" if interaction.guild else "DM", inline=False)
     embed.set_thumbnail(url=interaction.user.avatar.url if interaction.user.avatar else None)
-
+    
+    # Send embed to logs channel
     await log_channel.send(embed=embed)
-
+    
+    # Send embed via webhook
+    webhook_payload = {
+        "embeds": [embed.to_dict()]
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(WEBHOOK_URL, json=webhook_payload) as resp:
+            if resp.status not in (200, 204):
+                print(f"❗ Failed to send webhook log: HTTP {resp.status}")
 # ─── Discord Bot ─────────────────────────────────────────────────
 intents = discord.Intents.default()
 intents.guilds = True
