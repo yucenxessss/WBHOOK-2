@@ -27,7 +27,7 @@ def keep_alive():
 
 # ─── Logging Function ─────────────────────────────────────
 async def log_command_usage(interaction: discord.Interaction, command_name: str):
-    LOG_CHANNEL_ID = 123456789012345678  # <-- Replace with your logs channel ID
+    LOG_CHANNEL_ID = 1365305515189473375  # <-- Replace with your logs channel ID
     log_channel = interaction.client.get_channel(LOG_CHANNEL_ID)
     if not log_channel:
         return
