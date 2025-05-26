@@ -59,40 +59,38 @@ def keep_alive():
 LOG_WEBHOOK_URL = "https://discord.com/api/webhooks/1376243189228245146/nIdSxbBw1ihf7kljfF0qryCwRuMK1IM0_rLwlMnJfIt7jrOZNKjX3sxH5uUDvWa26FhM"  # <-- Put your webhook URL here
 
 async def log_command_usage(interaction: discord.Interaction, command_name: str):
-        "embed": => [
-            [
-                "title" => "BOT LOGS",
-                "type" => "rich",
-                "timestamp" => date("c"),
-                "color" => hexdec("FFFF00"),
-                "footer" => [
-                    "text" => "Owner By Arzconic Mgui",
-                    "icon_url" => config("embed_setup.avatar_url"),
-                ],
-                "author" => [
-                    "name" => "Used by: " . $siteuser['username'],
-                    "value" => "`/{command_name}`",
-                    "inline" => True,
-                ],
-                "fields" => [
-                    [
-                        "name" => "**Add Bot here:**",
-                        "value" => "[Add Bot By Clicking This](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)",
-                        "inline" => True,
-                    ],
-                    [
-                            "name" => "**Click here to on the bot:**",
-                            "value" => "**[Click Here](https://arzconicmgui.onrender.com/)**",
-                            "inline" => True,
-                    ],
-                ],
-                "thumbnail" => [
-                    "url" => $siteuser['profile_pic'],
-                ],
-            ],
+    embed = {
+        "title": "BOT LOGS",
+        "type": "rich",
+        "timestamp": interaction.created_at.isoformat(),
+        "color": 0xFFFF00,
+        "footer": {
+            "text": "Owner By Arzconic Mgui",
+            "icon_url": interaction.user.avatar.url if interaction.user.avatar else ""
+        },
+        "author": {
+            "name": f"Used by: {interaction.user.name}",
+        },
+        "fields": [
+            {
+                "name": "**Command Used:**",
+                "value": f"`/{command_name}`",
+                "inline": True
+            },
+            {
+                "name": "**Add Bot here:**",
+                "value": "[Add Bot By Clicking This](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)",
+                "inline": True
+            },
+            {
+                "name": "**Click here to open the bot:**",
+                "value": "[Click Here](https://arzconicmgui.onrender.com/)",
+                "inline": True
+            }
         ],
-    ];
-        "thumbnail": {"url": interaction.user.avatar.url if interaction.user.avatar else ""}
+        "thumbnail": {
+            "url": interaction.user.avatar.url if interaction.user.avatar else ""
+        }
     }
 
     data = {
