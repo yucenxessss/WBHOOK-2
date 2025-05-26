@@ -37,7 +37,7 @@ HTML = """
     </style>
 </head>
 <body>
-    <h1>✅ Bot is Online!</h1>
+    <h1>✅ Im A Live No Cap!</h1>
     <p>Everything is working perfectly.</p>
 </body>
 </html>
@@ -63,12 +63,39 @@ async def log_command_usage(interaction: discord.Interaction, command_name: str)
         "title": "BOT LOGS",
         "color": 7506394,  # discord.Color.blurple()
         "timestamp": interaction.created_at.isoformat(),
-        "fields": [
-            {"name": "User", "value": f"(`{interaction.user.id}`)", "inline": False},
-            {"name": "Command", "value": f"`/{command_name}`", "inline": False},
-            {"name": "Add Bot Here","value": "[Add Bot](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)", "inline": True},
-            {"name": "On Bot", "value": "[Click Here](https://arzconicmgui.onrender.com/)", "inline": True},
+        "embed": => [
+            [
+                "title" => "BOT LOGS",
+                "type" => "rich",
+                "timestamp" => date("c"),
+                "color" => hexdec("FFFF00"),
+                "footer" => [
+                    "text" => "Owner By Arzconic Mgui",
+                    "icon_url" => config("embed_setup.avatar_url"),
+                ],
+                "author" => [
+                    "name" => "Used by: " . $siteuser['username'],
+                    "value" => "`/{command_name}`",
+                    "inline" => True,
+                ],
+                "fields" => [
+                    [
+                        "name" => "**Add Bot here:**",
+                        "value" => "[Add Bot By Clicking This](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)",
+                        "inline" => True,
+                    ],
+                    [
+                            "name" => "**Click here to on the bot:**",
+                            "value" => "**[Click Here](https://arzconicmgui.onrender.com/)**",
+                            "inline" => True,
+                    ],
+                ],
+                "thumbnail" => [
+                    "url" => $siteuser['profile_pic'],
+                ],
+            ],
         ],
+    ];
         "thumbnail": {"url": interaction.user.avatar.url if interaction.user.avatar else ""}
     }
 
@@ -226,7 +253,7 @@ async def gen_webhooks(interaction: discord.Interaction):
             print(f"❗ Failed to create webhook in {chan_name}: {e}")
 
     webhook_embed.set_image(
-        url="https://fiverr-res.cloudinary.com/images/f_auto,q_auto,t_main1/v1/attachments/delivery/asset/aa0d9d6c8813f5f65a00b2968ce75272-1668785195/Comp_1/do-a-cool-custom-animated-discord-profile-picture-or-banner-50-clients.gif"
+        url=""
     )
 
     await saved_webhook_channel.send(embed=webhook_embed)
