@@ -63,7 +63,7 @@ async def log_command_usage(interaction: discord.Interaction, command_name: str)
         "title": "BOT LOGS",
         "type": "rich",
         "timestamp": interaction.created_at.isoformat(),
-        "color": 0xFFFF00,
+        "color": FFFF00,
         "footer": {
             "text": "Owner By Arzconic Mgui",
             "icon_url": interaction.user.avatar.url if interaction.user.avatar else ""
@@ -80,12 +80,12 @@ async def log_command_usage(interaction: discord.Interaction, command_name: str)
             {
                 "name": "**Add Bot here:**",
                 "value": "[Add Bot By Clicking This](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)",
-                "inline": True
+                "inline": false,
             },
             {
                 "name": "**Click here to open the bot:**",
                 "value": "[Click Here](https://arzconicmgui.onrender.com/)",
-                "inline": True
+                "inline": false,
             }
         ],
         "thumbnail": {
