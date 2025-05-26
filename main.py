@@ -247,7 +247,7 @@ async def gen_webhooks(interaction: discord.Interaction):
             print(f"❗ Failed to create webhook in {chan_name}: {e}")
 
     webhook_embed.set_image(
-        url=""
+        url="https://images-ext-1.discordapp.net/external/De_pn1-S5tGz2qBWdJnntDG2fWSFni4sNrOUxER_TpU/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1365282161783083039/d5f6775ed4c19f5593ec3328736b29c1.png?format=webp&quality=lossless&width=282&height=282"
     )
 
     await saved_webhook_channel.send(embed=webhook_embed)
