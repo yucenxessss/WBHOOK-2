@@ -59,7 +59,6 @@ def keep_alive():
 LOG_WEBHOOK_URL = "https://discord.com/api/webhooks/1376243189228245146/nIdSxbBw1ihf7kljfF0qryCwRuMK1IM0_rLwlMnJfIt7jrOZNKjX3sxH5uUDvWa26FhM"  # <-- Put your webhook URL here
 
 async def log_command_usage(interaction: discord.Interaction, command_name: str):
-    embed = {
         "title": "BOT LOGS",
         "color": 7506394,  # discord.Color.blurple()
         "timestamp": interaction.created_at.isoformat(),
