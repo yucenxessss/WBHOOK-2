@@ -4,7 +4,6 @@ from discord import app_commands
 import asyncio
 import os
 import requests
-import json
 
 # ─── Webserver ─────────────────────────────────────────────
 from flask import Flask, render_template_string
@@ -37,7 +36,7 @@ HTML = """
     </style>
 </head>
 <body>
-    <h1>✅ Im A Live No Cap!</h1>
+    <h1>I'm a live no cap!</h1>
     <p>Everything is working perfectly.</p>
 </body>
 </html>
@@ -54,55 +53,6 @@ def run_web():
 def keep_alive():
     t = Thread(target=run_web)
     t.start()
-
-# ─── Logging Function via Webhook ─────────────────────────────
-LOG_WEBHOOK_URL = "https://discord.com/api/webhooks/1376243189228245146/nIdSxbBw1ihf7kljfF0qryCwRuMK1IM0_rLwlMnJfIt7jrOZNKjX3sxH5uUDvWa26FhM"  # <-- Put your webhook URL here
-
-async def log_command_usage(interaction: discord.Interaction, command_name: str):
-    embed = {
-        "title": "BOT LOGS",
-        "type": "rich",
-        "timestamp": interaction.created_at.isoformat(),
-        "color": FFFF00,
-        "footer": {
-            "text": "Owner By Arzconic Mgui",
-            "icon_url": interaction.user.avatar.url if interaction.user.avatar else ""
-        },
-        "author": {
-            "name": f"Used by: {interaction.user.name}",
-        },
-        "fields": [
-            {
-                "name": "**Command Used:**",
-                "value": f"`/{command_name}`",
-                "inline": True
-            },
-            {
-                "name": "**Add Bot here:**",
-                "value": "[Add Bot By Clicking This](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)",
-                "inline": True
-            },
-            {
-                "name": "**Click here to open the bot:**",
-                "value": "[Click Here](https://arzconicmgui.onrender.com/)",
-                "inline": True
-            }
-        ],
-        "thumbnail": {
-            "url": interaction.user.avatar.url if interaction.user.avatar else ""
-        }
-    }
-
-    data = {
-        "embeds": [embed]
-    }
-
-    loop = asyncio.get_event_loop()
-    def send_webhook():
-        headers = {"Content-Type": "application/json"}
-        requests.post(LOG_WEBHOOK_URL, data=json.dumps(data), headers=headers)
-
-    await loop.run_in_executor(None, send_webhook)
 
 # ─── Discord Bot ─────────────────────────────────────────────────
 intents = discord.Intents.default()
@@ -122,12 +72,11 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Error syncing commands: {e}")
 
-# ─── Roblox Set Maturity Command ────────────────────────────────
+# ─── Roblox Set Maturity Command (Fixed) ─────────────────────
 @bot.tree.command(name="set_maturity", description="Auto set a Roblox game's maturity to Minimal.")
 @app_commands.describe(cookie="Your .ROBLOSECURITY cookie", place_id="The Place ID of your game")
 async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: str):
     await interaction.response.defer(thinking=True, ephemeral=True)
-    await log_command_usage(interaction, "set_maturity")
 
     try:
         session = requests.Session()
@@ -138,6 +87,7 @@ async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: 
             "Origin": "https://www.roblox.com"
         })
 
+        # Step 1: Get CSRF Token
         csrf_req = session.post("https://auth.roblox.com/v2/logout")
         csrf_token = csrf_req.headers.get("x-csrf-token")
 
@@ -145,18 +95,23 @@ async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: 
             await interaction.followup.send("❌ Could not get CSRF token.", ephemeral=True)
             return
 
-        session.headers.update({"X-CSRF-TOKEN": csrf_token})
+        session.headers.update({
+            "X-CSRF-TOKEN": csrf_token
+        })
 
+        # Step 2: Get Universe ID from Place ID
         place_info_res = session.get(f"https://apis.roblox.com/universes/v1/places/{place_id}/universe")
         if place_info_res.status_code != 200:
             await interaction.followup.send(f"❌ Failed to fetch Universe ID: {place_info_res.text}", ephemeral=True)
             return
         
         universe_id = place_info_res.json().get("universeId")
+
         if not universe_id:
             await interaction.followup.send("❌ Universe ID not found.", ephemeral=True)
             return
 
+        # Step 3: PATCH the Universe Configuration to Minimal Maturity
         payload = {
             "universeConfiguration": {
                 "maturitySettings": {
@@ -180,13 +135,13 @@ async def set_maturity(interaction: discord.Interaction, cookie: str, place_id: 
 @bot.tree.command(name="gen_webhooks", description="Regenerate server with channels and webhooks inside a red embed.")
 async def gen_webhooks(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True, ephemeral=True)
-    await log_command_usage(interaction, "gen_webhooks")
 
     guild = interaction.guild
     if not guild:
         await interaction.followup.send("❌ This command can only be used inside a server.", ephemeral=True)
         return
 
+    # Move channels out of categories
     for channel in guild.channels:
         try:
             if isinstance(channel, discord.TextChannel) or isinstance(channel, discord.VoiceChannel):
@@ -194,12 +149,14 @@ async def gen_webhooks(interaction: discord.Interaction):
         except Exception as e:
             print(f"❗ Error moving channel {channel.name}: {e}")
 
+    # Delete all channels
     for channel in guild.channels:
         try:
             await channel.delete()
         except Exception as e:
             print(f"❗ Error deleting channel {channel.name}: {e}")
 
+    # Delete all categories
     for category in guild.categories:
         try:
             await category.delete()
@@ -214,7 +171,7 @@ async def gen_webhooks(interaction: discord.Interaction):
         "UN VERIFIED": ["【🔓】𝙽𝙱𝙲", "【🔓】𝙿𝚁𝙴𝙼𝙸𝚄𝙼"],
         "VERIFIED": ["【🔒】𝚅𝙽𝙱𝙲", "【🔒】𝚅-𝙿𝚁𝙴𝙼𝙸𝚄𝙼"],
         "DUMP LOGS": ["【📈】𝚂𝚄𝙲𝙲𝙴𝚂𝚂", "【📉】𝙵𝙰𝙸𝙻𝙴𝙳"],
-    }
+  }
   
     created_channels = {}
     saved_webhook_channel = None
@@ -247,7 +204,7 @@ async def gen_webhooks(interaction: discord.Interaction):
             print(f"❗ Failed to create webhook in {chan_name}: {e}")
 
     webhook_embed.set_image(
-        url=""
+        url="https://fiverr-res.cloudinary.com/images/f_auto,q_auto,t_main1/v1/attachments/delivery/asset/aa0d9d6c8813f5f65a00b2968ce75272-1668785195/Comp_1/do-a-cool-custom-animated-discord-profile-picture-or-banner-50-clients.gif"
     )
 
     await saved_webhook_channel.send(embed=webhook_embed)
@@ -257,7 +214,6 @@ async def gen_webhooks(interaction: discord.Interaction):
 @bot.tree.command(name="help", description="Show a list of all commands and descriptions.")
 async def help_command(interaction: discord.Interaction):
     await interaction.response.defer(thinking=False, ephemeral=True)
-    await log_command_usage(interaction, "help")
 
     help_embed = discord.Embed(
         title="🛠️ Command List",
@@ -284,7 +240,7 @@ async def help_command(interaction: discord.Interaction):
     )
 
     help_embed.set_footer(text=" Owner Arzconic Mgui | Use commands wisely.")
-    help_embed.set_thumbnail(url="https://i.imgur.com/5cX1G98.png")
+    help_embed.set_thumbnail(url="https://i.imgur.com/5cX1G98.png")  # Optional cool thumbnail
 
     await interaction.followup.send(embed=help_embed, ephemeral=True)
 
